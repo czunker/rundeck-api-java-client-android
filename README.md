@@ -16,3 +16,14 @@ http://stackoverflow.com/questions/4799151/apache-http-client-or-urlconnection
 
 So I cloned the Rundeck Java API and replaced all occurences of org.apache.http with ch.boye.httpclientandroidlib and added the httpclientandroidlib as dependency to maven pom.xml. 
 After that I repacked the jar, put it in my android app, recompiled it and everything worked fine.
+
+Because I didn't find the adjusted http client library in a maven reposirtory, I added it with my local filesystem:
+<!-- HTTP Client for Android -->
+    <dependency>
+    	<groupId>ch.boye.httpclientandroidlib</groupId>
+        <artifactId>ch.boye.httpclientandroidlib</artifactId>
+        <version>1.1.1</version>
+        <scope>system</scope>  
+        <systemPath>/home/xyz/workspace/rundeck-api-java-client/libs/httpclientandroidlib-1.1.1.jar</systemPath>    
+    </dependency>
+So this repository will not work out of github. You have to change the path, according to your local filesystem.
