@@ -1,0 +1,37 @@
+
+h1. Status of the implementation of the RunDeck API
+
+h2. RunDeck API version 1
+
+[Documentation of the RunDeck API version 1|http://rundeck.org/1.2.1/RunDeck-Guide.html#rundeck-api]
+
+* Login-based authentication - OK
+* System Info - OK
+* Listing Jobs - OK
+* Running a Job - OK
+* Exporting Jobs - OK
+* Importing Jobs - OK
+* Getting a Job Definition - OK
+* Deleting a Job Definition - OK
+* Getting Executions for a Job - OK
+* Listing Running Executions - OK
+* Getting Execution Info - OK
+* Aborting Executions - OK
+* Running Adhoc Commands - OK
+* Running Adhoc Scripts - OK
+* Listing Projects - OK
+* Getting Project Info - OK
+* Listing History - OK
+* Creating History Event Reports - *TODO*
+* Listing Resources - OK
+* Getting Resource Info - OK
+
+h2. RunDeck API version 2
+
+[Documentation of the RunDeck API version 2|http://rundeck.org/1.3.2/api/index.html]
+
+* Token-based authentication - OK
+* Listing Jobs for a Project - *TODO*
+* Updating and Listing Resources for a Project - *TODO*
+* Refreshing Resources for a Project - *TODO*
+

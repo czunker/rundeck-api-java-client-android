@@ -1,0 +1,136 @@
+
+h1. Using the RunDeck API from JRuby scripts
+
+Here are some examples of what you can do with this lib and a few lines of [Ruby|http://www.jruby.org/] (for the rubyist that don't fear running on the JVM !)
+
+You will have to [download|./download.html] the lib (the .jar file) to use it...
+
+h2. Basic usage
+
+Save the following script in a file named "{{rundeck.rb}}", and execute it with "{{jruby rundeck.rb}}".
+
+{code}
+require 'java'
+require '/path/to/rundeck-api-java-client-VERSION-jar-with-dependencies.jar'
+import org.rundeck.api.RundeckClient
+
+rundeck = RundeckClient.new("http://localhost:4440", "admin", "admin")
+
+puts "RunDeck uptime : #{rundeck.systemInfo.uptime}"
+puts "All RunDeck projects : #{rundeck.projects}"
+puts "All RunDeck nodes : #{rundeck.nodes}"
+puts "All RunDeck jobs : #{rundeck.jobs}"
+puts "All RunDeck running executions : #{rundeck.runningExecutions}"
+{code}
+
+You can also add the library to the classpath : save the following script in a file named "{{rundeck.rb}}", and execute it with "{{jruby -rjava -J-cp /path/to/rundeck-api-java-client-VERSION-jar-with-dependencies.jar rundeck.rb}}".
+
+{code}
+import org.rundeck.api.RundeckClient
+
+rundeck = RundeckClient.new("http://localhost:4440", "admin", "admin")
+
+puts "RunDeck uptime : #{rundeck.systemInfo.uptime}"
+puts "All RunDeck projects : #{rundeck.projects}"
+puts "All RunDeck nodes : #{rundeck.nodes}"
+puts "All RunDeck jobs : #{rundeck.jobs}"
+puts "All RunDeck running executions : #{rundeck.runningExecutions}"
+{code}
+
+h2. Authentication
+
+Starting with RunDeck API 2, there are 2 ways to authenticate :
+* the *login-based authentication* : with your login and password
+* the *token-based authentication* : with a unique token that you can generate from the RunDeck webUI
+
+{code}
+// using login-based authentication (admin/admin is the default login/password for a new RunDeck instance) :
+rundeck = RundeckClient.new("http://localhost:4440", "admin", "admin");
+
+// using token-based authentication :
+rundeck = RundeckClient.new("http://localhost:4440", "PDDNKo5VE29kpk4prOUDr2rsKdRkEvsD");
+{code}
+
+h2. Running a job
+
+{code}
+import org.rundeck.api.RundeckClient
+import org.rundeck.api.OptionsBuilder
+import org.rundeck.api.NodeFiltersBuilder
+
+rundeck = RundeckClient.new("http://localhost:4440", "admin", "admin")
+
+// find a job from its name, group and project
+job = rundeck.findJob("my-project", "main-group/sub-group", "job-name")
+puts "Found job with ID : #{job.id}"
+
+// trigger a simple job with no options
+execution = rundeck.triggerJob(job.id)
+puts "Execution started, you can follow it at the URL : #{execution.url}"
+
+// or with options...
+execution = rundeck.triggerJob("job-id", OptionsBuilder.new().addOption("option1", "value one").addOption("option2", "value two").toProperties())
+
+// you can also override the nodes on which the job should execute
+execution = rundeck.triggerJob("job-id", OptionsBuilder.new().addOption("opt", "value").toProperties(), NodeFiltersBuilder.new().tags("prod+appserv").toProperties())
+
+// last one : you can run a job and wait until its execution is finished :
+execution = rundeck.runJob("job-id")
+puts "Execution finished ! Status : #{execution.status}, duration : #{execution.duration}"
+{code}
+
+h2. Running an ad-hoc command
+
+{code}
+import org.rundeck.api.RundeckClient
+import org.rundeck.api.NodeFiltersBuilder
+
+rundeck = RundeckClient.new("http://localhost:4440", "admin", "admin")
+
+// trigger the execution of the "uptime" command on the RunDeck server
+execution = rundeck.triggerAdhocCommand("my-project", "uptime")
+
+// run the "uptime" command on all unix nodes
+execution = rundeck.runAdhocCommand("my-project", "uptime", NodeFiltersBuilder.new().osFamily("unix").toProperties())
+{code}
+
+h2. Running an ad-hoc script
+
+{code}
+import org.rundeck.api.RundeckClient
+import org.rundeck.api.OptionsBuilder
+import org.rundeck.api.NodeFiltersBuilder
+
+rundeck = RundeckClient.new("http://localhost:4440", "admin", "admin")
+
+// trigger the execution of a custom bash script on the RunDeck server
+execution = rundeck.triggerAdhocScript("my-project", "/tmp/my-script.sh")
+
+// run a bash script (with options) on all unix nodes
+execution = rundeck.runAdhocCommand("my-project", "/tmp/my-script-with-options.sh", OptionsBuilder.new().addOption("option1", "value one").toProperties(), NodeFiltersBuilder.new().osFamily("unix").toProperties())
+{code}
+
+h2. Exporting jobs
+
+{code}
+import org.rundeck.api.RundeckClient
+rundeck = RundeckClient.new("http://localhost:4440", "admin", "admin")
+
+rundeck.exportJobsToFile("/tmp/jobs.xml", "xml", "my-project")
+rundeck.exportJobToFile("/tmp/job.yaml", "yaml", "job-id")
+{code}
+
+h2. Importing jobs
+
+{code}
+import org.rundeck.api.RundeckClient
+rundeck = RundeckClient.new("http://localhost:4440", "admin", "admin")
+
+result = rundeck.importJobs("/tmp/jobs.xml", "xml")
+puts "#{result.succeededJobs.size} jobs successfully imported, #{result.skippedJobs.size} jobs skipped, and #{result.failedJobs.size} jobs failed"
+{code}
+
+h2. And more...
+
+See the API documentation of the [RundeckClient|./apidocs/reference/org/rundeck/api/RundeckClient.html] class for more interactions with your RunDeck instance...
+

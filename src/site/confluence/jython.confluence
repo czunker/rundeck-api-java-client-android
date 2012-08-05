@@ -1,0 +1,120 @@
+
+h1. Using the RunDeck API from Jython scripts
+
+Here are some examples of what you can do with this lib and a few lines of [Python|http://www.jython.org/] (for the pythonist that don't fear running on the JVM !)
+
+You will have to [download|./download.html] the lib (the .jar file) to use it...
+
+h2. Basic usage
+
+Save the following script in a file named "{{rundeck.py}}", and execute it with "{{jython -J-cp /path/to/rundeck-api-java-client-VERSION-jar-with-dependencies.jar rundeck.py}}".
+
+{code}
+from org.rundeck.api import RundeckClient
+
+rundeck = RundeckClient("http://localhost:4440", "admin", "admin")
+
+print("RunDeck uptime : %s" % rundeck.systemInfo.uptime)
+print("All RunDeck projects : %s" % rundeck.projects)
+print("All RunDeck nodes : %s" % rundeck.nodes)
+print("All RunDeck jobs : %s" % rundeck.jobs)
+print("All RunDeck running executions : %s" % rundeck.runningExecutions)
+{code}
+
+h2. Authentication
+
+Starting with RunDeck API 2, there are 2 ways to authenticate :
+* the *login-based authentication* : with your login and password
+* the *token-based authentication* : with a unique token that you can generate from the RunDeck webUI
+
+{code}
+// using login-based authentication (admin/admin is the default login/password for a new RunDeck instance) :
+rundeck = RundeckClient("http://localhost:4440", "admin", "admin");
+
+// using token-based authentication :
+rundeck = RundeckClient("http://localhost:4440", "PDDNKo5VE29kpk4prOUDr2rsKdRkEvsD");
+{code}
+
+h2. Running a job
+
+{code}
+from org.rundeck.api import RundeckClient
+from org.rundeck.api import OptionsBuilder
+from org.rundeck.api import NodeFiltersBuilder
+
+rundeck = RundeckClient("http://localhost:4440", "admin", "admin")
+
+// find a job from its name, group and project
+job = rundeck.findJob("my-project", "main-group/sub-group", "job-name")
+print("Found job with ID : %s" % job.id)
+
+// trigger a simple job with no options
+execution = rundeck.triggerJob(job.id)
+print("Execution started, you can follow it at the URL : %s" % execution.url)
+
+// or with options...
+execution = rundeck.triggerJob("job-id", OptionsBuilder().addOption("option1", "value one").addOption("option2", "value two").toProperties())
+
+// you can also override the nodes on which the job should execute
+execution = rundeck.triggerJob("job-id", OptionsBuilder().addOption("opt", "value").toProperties(), NodeFiltersBuilder().tags("prod+appserv").toProperties())
+
+// last one : you can run a job and wait until its execution is finished :
+execution = rundeck.runJob("job-id")
+print("Execution finished ! Status : %s, duration : %s" % (execution.status, execution.duration))
+{code}
+
+h2. Running an ad-hoc command
+
+{code}
+from org.rundeck.api import RundeckClient
+from org.rundeck.api import NodeFiltersBuilder
+
+rundeck = RundeckClient("http://localhost:4440", "admin", "admin")
+
+// trigger the execution of the "uptime" command on the RunDeck server
+execution = rundeck.triggerAdhocCommand("my-project", "uptime")
+
+// run the "uptime" command on all unix nodes
+execution = rundeck.runAdhocCommand("my-project", "uptime", NodeFiltersBuilder().osFamily("unix").toProperties())
+{code}
+
+h2. Running an ad-hoc script
+
+{code}
+from org.rundeck.api import RundeckClient
+from org.rundeck.api import OptionsBuilder
+from org.rundeck.api import NodeFiltersBuilder
+
+rundeck = RundeckClient("http://localhost:4440", "admin", "admin")
+
+// trigger the execution of a custom bash script on the RunDeck server
+execution = rundeck.triggerAdhocScript("my-project", "/tmp/my-script.sh")
+
+// run a bash script (with options) on all unix nodes
+execution = rundeck.runAdhocCommand("my-project", "/tmp/my-script-with-options.sh", OptionsBuilder().addOption("option1", "value one").toProperties(), NodeFiltersBuilder().osFamily("unix").toProperties())
+{code}
+
+h2. Exporting jobs
+
+{code}
+from org.rundeck.api import RundeckClient
+rundeck = RundeckClient("http://localhost:4440", "admin", "admin")
+
+rundeck.exportJobsToFile("/tmp/jobs.xml", "xml", "my-project")
+rundeck.exportJobToFile("/tmp/job.yaml", "yaml", "job-id")
+{code}
+
+h2. Importing jobs
+
+{code}
+from org.rundeck.api import RundeckClient
+rundeck = RundeckClient("http://localhost:4440", "admin", "admin")
+
+result = rundeck.importJobs("/tmp/jobs.xml", "xml")
+print("%s jobs successfully imported, %s jobs skipped, and %s jobs failed" % (result.succeededJobs.size, result.skippedJobs.size, result.failedJobs.size))
+{code}
+
+h2. And more...
+
+See the API documentation of the [RundeckClient|./apidocs/reference/org/rundeck/api/RundeckClient.html] class for more interactions with your RunDeck instance...
+

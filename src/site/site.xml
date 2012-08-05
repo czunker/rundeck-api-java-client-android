@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright 2011 Vincent Behar
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/DECORATION/1.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.1.0 http://maven.apache.org/xsd/decoration-1.1.0.xsd"
+         name="${project.name}">
+  <googleAnalyticsAccountId>UA-23435653-1</googleAnalyticsAccountId>
+  <publishDate position="right" />
+  <version position="right" />
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.0</version>
+  </skin>
+  <body>
+    <breadcrumbs>
+      <item name="RunDeck" href="http://rundeck.org" />
+      <item name="RunDeck API - Java Client" href="" />
+    </breadcrumbs>
+    <menu name="${project.name}">
+      <item name="Introduction" href="index.html" />
+      <item name="Status" href="status.html" />
+      <item name="FAQ" href="faq.html" />
+      <item name="Download" href="download.html" />
+      <item name="Changelog" href="changes-report.html" />
+      <item name="API Documentation" href="apidocs/index.html" />
+    </menu>
+    <menu name="Scripting examples">
+      <item name="Introduction" href="scripting.html" />
+      <item name="Groovy" href="groovy.html" />
+      <item name="JRuby" href="jruby.html" />
+      <item name="Jython" href="jython.html" />
+    </menu>
+    <menu name="Older versions">
+      <item name="1.x (RunDeck 1.2)" href="1.x/index.html" />
+    </menu>
+    <menu ref="reports" />
+  </body>
+</project>
